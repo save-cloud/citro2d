@@ -57,7 +57,7 @@ static int C2Di_GlyphComp(const void* _g1, const void* _g2)
 	return ret;
 }
 
-static void C2Di_TextEnsureLoad(void)
+static void C2Di_TextEnsureLoad(const C2D_Font use_font)
 {
 	// Skip if already loaded
 	if (s_glyphSheets)
@@ -68,7 +68,12 @@ static void C2Di_TextEnsureLoad(void)
 		svcBreak(USERBREAK_PANIC);
 
 	// Load the glyph texture sheets
-	CFNT_s* font = fontGetSystemFont();
+	CFNT_s* font = NULL;
+  if (use_font != NULL) {
+    font = use_font->cfnt;
+  } else {
+    font = fontGetSystemFont();
+  }
 	TGLP_s* glyphInfo = fontGetGlyphInfo(font);
 	s_glyphSheets = malloc(sizeof(C3D_Tex)*glyphInfo->nSheets);
 	s_textScale = 30.0f / glyphInfo->cellHeight;
@@ -91,9 +96,9 @@ static void C2Di_TextEnsureLoad(void)
 	}
 }
 
-C2D_TextBuf C2D_TextBufNew(size_t maxGlyphs)
+C2D_TextBuf C2D_TextBufNew(const C2D_Font use_font, size_t maxGlyphs)
 {
-	C2Di_TextEnsureLoad();
+	C2Di_TextEnsureLoad(use_font);
 
 	C2D_TextBuf buf = (C2D_TextBuf)malloc(C2Di_TextBufBufferSize(maxGlyphs));
 	if (!buf) return NULL;
@@ -234,8 +239,14 @@ void C2D_TextOptimize(const C2D_Text* text)
 	qsort(&text->buf->glyphs[text->begin], text->end-text->begin, sizeof(C2Di_Glyph), C2Di_GlyphComp);
 }
 
-void C2D_TextGetDimensions(const C2D_Text* text, float scaleX, float scaleY, float* outWidth, float* outHeight)
+void C2D_TextGetDimensions(const C2D_Font use_font, const C2D_Text* text, float scaleX, float scaleY, float* outWidth, float* outHeight)
 {
+	CFNT_s* systemFont = NULL;
+  if (use_font != NULL) {
+    systemFont = use_font->cfnt;
+  } else {
+    systemFont = fontGetSystemFont();
+  }
 	if (outWidth)
 		*outWidth  = scaleX*text->width;
 	if (outHeight)
@@ -243,7 +254,7 @@ void C2D_TextGetDimensions(const C2D_Text* text, float scaleX, float scaleY, flo
 		if (text->font)
 			*outHeight = ceilf(scaleY*text->font->textScale*text->font->cfnt->finf.lineFeed)*text->lines;
 		else
-			*outHeight = ceilf(scaleY*s_textScale*fontGetInfo(fontGetSystemFont())->lineFeed)*text->lines;
+			*outHeight = ceilf(scaleY*s_textScale*fontGetInfo(systemFont)->lineFeed)*text->lines;
 	}
 }
 
@@ -313,7 +324,7 @@ static inline void C2Di_CalcLineWidths(float* widths, const C2D_Text* text, cons
 	}
 }
 
-void C2D_DrawText(const C2D_Text* text, u32 flags, float x, float y, float z, float scaleX, float scaleY, ...)
+void C2D_DrawText(const C2D_Font use_font, const C2D_Text* text, u32 flags, float x, float y, float z, float scaleX, float scaleY, ...)
 {
 	// If there are no words, we can't do the math calculations necessary with them. Just return; nothing would be drawn anyway.
 	if (text->words == 0)
@@ -321,7 +332,12 @@ void C2D_DrawText(const C2D_Text* text, u32 flags, float x, float y, float z, fl
 	C2Di_Glyph* begin = &text->buf->glyphs[text->begin];
 	C2Di_Glyph* end   = &text->buf->glyphs[text->end];
 	C2Di_Glyph* cur;
-	CFNT_s* systemFont = fontGetSystemFont();
+	CFNT_s* systemFont = NULL;
+  if (use_font != NULL) {
+    systemFont = use_font->cfnt;
+  } else {
+    systemFont = fontGetSystemFont();
+  }
 
 	float glyphZ = z;
 	float glyphH;

@@ -41,7 +41,7 @@ enum
  *  @param[in] maxGlyphs Maximum number of glyphs that can be stored in the buffer.
  *  @returns Text buffer handle (or NULL on failure).
  */
-C2D_TextBuf C2D_TextBufNew(size_t maxGlyphs);
+C2D_TextBuf C2D_TextBufNew(const C2D_Font use_font, size_t maxGlyphs);
 
 /** @brief Resizes a text buffer.
  *  @param[in] buf Text buffer to resize.
@@ -135,7 +135,7 @@ void C2D_TextOptimize(const C2D_Text* text);
  *  @param[out] outWidth (optional) Variable in which to store the width of the text.
  *  @param[out] outHeight (optional) Variable in which to store the height of the text.
  */
-void C2D_TextGetDimensions(const C2D_Text* text, float scaleX, float scaleY, float* outWidth, float* outHeight);
+void C2D_TextGetDimensions(const C2D_Font use_font, const C2D_Text* text, float scaleX, float scaleY, float* outWidth, float* outHeight);
 
 /** @brief Draws text using the GPU.
  *  @param[in] text Pointer to text object.
@@ -149,6 +149,6 @@ void C2D_TextGetDimensions(const C2D_Text* text, float scaleX, float scaleY, flo
  *  @param[in] scaleY Vertical size of the font. 1.0f corresponds to the native size of the font.
  *  @remarks The default 3DS system font has a glyph height of 30px, and the baseline is at 25px.
  */
-void C2D_DrawText(const C2D_Text* text, u32 flags, float x, float y, float z, float scaleX, float scaleY, ...);
+void C2D_DrawText(const C2D_Font use_font, const C2D_Text* text, u32 flags, float x, float y, float z, float scaleX, float scaleY, ...);
 
 /** @} */
