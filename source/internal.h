@@ -55,6 +55,10 @@ enum
 	C2DiF_Mode_ImageSolid = 3   << C2DiF_Mode_Shift,
 	C2DiF_Mode_ImageMult  = 4   << C2DiF_Mode_Shift,
 	C2DiF_Mode_ImageLuma  = 5   << C2DiF_Mode_Shift,
+	C2DiF_Mode_ImageAdd   = 6   << C2DiF_Mode_Shift,
+	C2DiF_Mode_ImageSub   = 7   << C2DiF_Mode_Shift,
+	C2DiF_Mode_ImageOMAdd = 8   << C2DiF_Mode_Shift,
+	C2DiF_Mode_ImageOMSub = 9   << C2DiF_Mode_Shift,
 
 	C2DiF_ProcTex_Shift  = 12,
 	C2DiF_ProcTex_Mask   = 0xf << C2DiF_ProcTex_Shift,
